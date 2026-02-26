@@ -1,0 +1,180 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "saco-chat",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -256,
+        -144
+      ],
+      "id": "178d42eb-6948-43c1-849f-b9e2d70757bd",
+      "name": "Webhook",
+      "webhookId": "7e6f146e-bf74-4959-ad67-6551724eadfc"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User Request: {{ $json.body.userPrompt }}\n\nCurrent SQL Code in Editor:\n```{{ $json.body.currentCode }}```",
+        "options": {
+          "systemMessage": "You are S.A.C.O., a secure AI SQL Copilot. Always respond in plain conversational text.\nCRITICAL RULES:\n1. SAFE DRAFTING: If the user asks you to write code, DO NOT execute it. Just output the drafted SQL code for the user to review.\n2. EXECUTION OVERRIDE: ONLY execute a query against the database if the user's prompt explicitly starts with the exact phrase \"SYSTEM_COMMAND_EXECUTE:\". If you see that phrase, run the query exactly as written. You MUST then display the actual data/rows returned by the database back to the user in a readable format."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        32,
+        -144
+      ],
+      "id": "54fde61a-f823-4840-bf05-ac3049b49488",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        80
+      ],
+      "id": "4bedfcb9-4534-4a5f-bec6-a587522ee20b",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "7xR2Pobcl4omyprm",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to test and verify SQL queries against the database before returning the final answer to the user.",
+        "operation": "executeQuery",
+        "query": "{{ $fromAI(\"queryToExecute\", \"The exact T-SQL query string to run against the database\") }}"
+      },
+      "type": "n8n-nodes-base.microsoftSqlTool",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        64
+      ],
+      "id": "deda9c06-87b0-4b3b-b9cc-f6dbff3defbd",
+      "name": "Microsoft SQL",
+      "credentials": {
+        "microsoftSql": {
+          "id": "CZrMPveGYqurc61O",
+          "name": "Microsoft SQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        384,
+        -144
+      ],
+      "id": "5f7b08ca-7845-42fd-8973-3b600394ff92",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "saco_session"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        112,
+        64
+      ],
+      "id": "5d00b9f2-73b9-476a-bcaa-eb52be645fe9",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft SQL": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "8e0712b9-10d9-4e07-94e6-96f1d1a8d620",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a364b34526e3906be41f8be74340ead780d373c2ff2861eca1f59e5f874a329a"
+  },
+  "id": "mq7RhPAQNyFf3dNz",
+  "tags": []
+}
