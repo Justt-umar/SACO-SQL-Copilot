@@ -15,7 +15,7 @@ import javafx.stage.Stage;
 import javafx.scene.image.Image;
 
 
-// NEW IMPORTS FOR ROBOT & CLIPBOARD
+// IMPORTS FOR ROBOT & CLIPBOARD
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
 import java.awt.Toolkit;
@@ -28,8 +28,20 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.Objects;
 
+/**
+ * S.A.C.O. — SQL Agentic Co-Pilot Orchestrator
+ *
+ * Cross-platform (macOS + Windows) desktop AI assistant that bridges
+ * MySQL Workbench with an n8n-hosted AI Agent for SQL code review,
+ * debugging, and direct query execution.
+ *
+ * Core workflow:
+ *   1. Scan IDE   — Pull code from MySQL Workbench into the local editor
+ *   2. AI Review  — Send code to n8n AI Agent for analysis
+ *   3. Grab Code  — Extract AI-generated SQL from chat history
+ *   4. Apply      — Inject corrected code back into MySQL Workbench
+ */
 public class AiSqlCopilot extends Application {
 
     private static final String N8N_WEBHOOK_URL = "http://localhost:5678/webhook/saco-chat";
@@ -39,8 +51,11 @@ public class AiSqlCopilot extends Application {
     private Button sendButton;
     private TextArea codeEditor;
     private Button runCodeButton;
-    private Button scanButton; // NEW: The Scan Button
+    private Button scanButton;
     private final HttpClient httpClient;
+
+    /** The display name of the target IDE (OS-aware via OsAutomation). */
+    private final String ideName = OsAutomation.targetIdeName();
 
     public AiSqlCopilot() {
         this.httpClient = HttpClient.newBuilder()
@@ -51,32 +66,31 @@ public class AiSqlCopilot extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("S.A.C.O. - AI SQL Co-pilot Workspace");
+        primaryStage.setTitle("S.A.C.O. — AI SQL Co-pilot Workspace");
 
+        // ── App Icon ──────────────────────────────────────────────
         try {
-            // Path A: The standard resources root (Maven/Gradle)
             var iconStream = getClass().getResourceAsStream("/saco-icon.png");
-
-            // Path B: If Path A fails, look relative to the class
             if (iconStream == null) {
                 iconStream = getClass().getResourceAsStream("saco-icon.png");
             }
-
-            // Path C: Try loading it as a direct file path if running locally
             if (iconStream != null) {
                 primaryStage.getIcons().add(new Image(iconStream));
             } else {
-                // If all Classpath attempts fail, try the local disk as a last resort
                 primaryStage.getIcons().add(new Image("file:saco-icon.png"));
             }
         } catch (Exception e) {
             System.out.println("Could not load icon: " + e.getMessage());
         }
-        // --- LEFT SIDE: CHAT PANEL ---
+
+        // ── Monospace font (OS-aware) ────────────────────────────
+        String monoFont = OsAutomation.monoFont();
+
+        // ── LEFT SIDE: CHAT PANEL ────────────────────────────────
         chatHistory = new TextArea();
         chatHistory.setEditable(false);
         chatHistory.setWrapText(true);
-        chatHistory.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 14px;");
+        chatHistory.setStyle("-fx-font-family: " + monoFont + "; -fx-font-size: 14px;");
         VBox.setVgrow(chatHistory, Priority.ALWAYS);
 
         inputField = new TextField();
@@ -95,25 +109,29 @@ public class AiSqlCopilot extends Application {
         VBox chatRoot = new VBox(10, chatHistory, inputBox);
         chatRoot.setPadding(new Insets(15));
 
-        // --- RIGHT SIDE: CODE EDITOR PANEL ---
+        // ── RIGHT SIDE: CODE EDITOR PANEL ────────────────────────
 
-        // NEW: Scan SSMS Button at the top
-        scanButton = new Button("🔍 Scan SSMS");
+        // 1. Scan IDE Button
+        scanButton = new Button("🔍 Scan " + ideName);
         scanButton.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-background-color: #007acc; -fx-text-fill: white;");
         scanButton.setMaxWidth(Double.MAX_VALUE);
-        scanButton.setOnAction(e -> scanSsmsClipboard());
+        scanButton.setOnAction(e -> scanIdeClipboard());
 
-        // Create the new Apply button
-        Button applyButton = new Button("⬇️ Apply to SSMS");
+        // 2. Grab AI Code Button
+        Button grabCodeButton = new Button("⬅️ Grab AI Code");
+        grabCodeButton.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-background-color: #6f42c1; -fx-text-fill: white;");
+        grabCodeButton.setMaxWidth(Double.MAX_VALUE);
+        grabCodeButton.setOnAction(e -> extractCodeToEditor());
+
+        // 3. Apply to IDE Button
+        Button applyButton = new Button("⬇️ Apply to " + ideName);
         applyButton.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-background-color: #ffc107; -fx-text-fill: black;");
         applyButton.setMaxWidth(Double.MAX_VALUE);
-        applyButton.setOnAction(e -> applyToSsms());
-
-        // Add applyButton to the VBox layout
+        applyButton.setOnAction(e -> applyToIde());
 
         codeEditor = new TextArea();
-        codeEditor.setPromptText("-- Click 'Scan SSMS' to pull your code here,\n-- or type it manually...");
-        codeEditor.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 14px; -fx-control-inner-background: #1e1e1e; -fx-text-fill: #d4d4d4;");
+        codeEditor.setPromptText("-- Click 'Scan " + ideName + "' to pull your code here,\n-- or type it manually...");
+        codeEditor.setStyle("-fx-font-family: " + monoFont + "; -fx-font-size: 14px; -fx-control-inner-background: #1e1e1e; -fx-text-fill: #d4d4d4;");
         VBox.setVgrow(codeEditor, Priority.ALWAYS);
 
         runCodeButton = new Button("▶ Run Code");
@@ -121,29 +139,10 @@ public class AiSqlCopilot extends Application {
         runCodeButton.setMaxWidth(Double.MAX_VALUE);
         runCodeButton.setOnAction(e -> sendMessage(codeEditor.getText(), true));
 
-        // 1. Existing Scan Button
-        scanButton = new Button("🔍 Scan SSMS");
-        scanButton.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-background-color: #007acc; -fx-text-fill: white;");
-        scanButton.setMaxWidth(Double.MAX_VALUE);
-        scanButton.setOnAction(e -> scanSsmsClipboard());
-
-        // 2. NEW: Grab AI Code Button
-        Button grabCodeButton = new Button("⬅️ Grab AI Code");
-        grabCodeButton.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-background-color: #6f42c1; -fx-text-fill: white;");
-        grabCodeButton.setMaxWidth(Double.MAX_VALUE);
-        grabCodeButton.setOnAction(e -> extractCodeToEditor());
-
-        // 3. Existing Apply Button
-        Button applyButton2 = new Button("⬇️ Apply to SSMS");
-        applyButton2.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-background-color: #ffc107; -fx-text-fill: black;");
-        applyButton2.setMaxWidth(Double.MAX_VALUE);
-        applyButton2.setOnAction(e -> applyToSsms());
-
-        // Add the scan button to the top of the right panel
-        VBox codeRoot = new VBox(10, scanButton, grabCodeButton, applyButton2, codeEditor, runCodeButton);
+        VBox codeRoot = new VBox(10, scanButton, grabCodeButton, applyButton, codeEditor, runCodeButton);
         codeRoot.setPadding(new Insets(15));
 
-        // --- COMBINE USING SPLITPANE ---
+        // ── COMBINE USING SPLITPANE ──────────────────────────────
         SplitPane splitPane = new SplitPane();
         splitPane.getItems().addAll(chatRoot, codeRoot);
         splitPane.setDividerPositions(0.4);
@@ -151,117 +150,111 @@ public class AiSqlCopilot extends Application {
         Scene scene = new Scene(splitPane, 1000, 600);
         primaryStage.setScene(scene);
 
-        // ALWAYS ON TOP & OPACITY APPLIED HERE
+        // ALWAYS ON TOP & OPACITY
         primaryStage.setAlwaysOnTop(true);
         primaryStage.setOpacity(0.95);
 
         primaryStage.show();
 
-        chatHistory.appendText("S.A.C.O. initialized with SSMS Scanner.\nMake sure SSMS is your active window before clicking Scan!\n\n");
+        // ── Startup message (OS-aware) ───────────────────────────
+        String osNote = OsAutomation.isMac()
+                ? "Running on macOS — ensure Accessibility permission is granted\n" +
+                  "(System Settings → Privacy & Security → Accessibility).\n"
+                : "Running on Windows.\n";
+
+        chatHistory.appendText("S.A.C.O. initialized. Target IDE: " + ideName + "\n"
+                + osNote
+                + "Make sure " + ideName + " is open before clicking Scan!\n\n");
     }
 
-    // NEW: The "Ghost" Keyboard Automation
-    private void scanSsmsClipboard() {
-        chatHistory.appendText("System: Scanning SSMS...\n");
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    //  SCAN IDE — Pull code from MySQL Workbench into the editor
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+    private void scanIdeClipboard() {
+        chatHistory.appendText("System: Scanning " + ideName + "...\n");
         scanButton.setDisable(true);
 
-        // Run in a background thread so we don't freeze the JavaFX UI
         new Thread(() -> {
             try {
                 Robot robot = new Robot();
 
-                // 1. Alt + Tab to switch to the last active window (SSMS)
-                robot.keyPress(KeyEvent.VK_ALT);
-                robot.keyPress(KeyEvent.VK_TAB);
-                robot.keyRelease(KeyEvent.VK_TAB);
-                robot.keyRelease(KeyEvent.VK_ALT);
+                // 1. Switch to the target IDE
+                OsAutomation.switchToIde(robot);
+                Thread.sleep(500); // Wait for OS to complete the switch
 
-                Thread.sleep(400); // Wait a fraction of a second for OS to switch windows
+                // 2. Select All (Cmd+A / Ctrl+A)
+                OsAutomation.modifierCombo(robot, KeyEvent.VK_A);
+                Thread.sleep(150);
 
-                // 2. Ctrl + A to Select All
-                robot.keyPress(KeyEvent.VK_CONTROL);
-                robot.keyPress(KeyEvent.VK_A);
-                robot.keyRelease(KeyEvent.VK_A);
-                robot.keyRelease(KeyEvent.VK_CONTROL);
+                // 3. Copy (Cmd+C / Ctrl+C)
+                OsAutomation.modifierCombo(robot, KeyEvent.VK_C);
+                Thread.sleep(300); // Wait for clipboard to populate
 
-                Thread.sleep(150); // Small pause
-
-                // 3. Ctrl + C to Copy
-                robot.keyPress(KeyEvent.VK_CONTROL);
-                robot.keyPress(KeyEvent.VK_C);
-                robot.keyRelease(KeyEvent.VK_C);
-                robot.keyRelease(KeyEvent.VK_CONTROL);
-
-                Thread.sleep(250); // Wait for the OS to lock the text into the clipboard
-
-                // 4. Read the text from the System Clipboard
+                // 4. Read text from the system clipboard
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 String copiedText = (String) clipboard.getData(DataFlavor.stringFlavor);
 
-                // 5. Update the UI back on the main JavaFX thread
+                // 5. Update UI on the JavaFX thread
                 Platform.runLater(() -> {
                     codeEditor.setText(copiedText);
-                    chatHistory.appendText("System: Code successfully pulled from SSMS.\n\n");
+                    chatHistory.appendText("System: Code successfully pulled from " + ideName + ".\n\n");
                     scanButton.setDisable(false);
                 });
 
             } catch (Exception ex) {
                 Platform.runLater(() -> {
-                    chatHistory.appendText("Error scanning SSMS: " + ex.getMessage() + "\n\n");
+                    chatHistory.appendText("Error scanning " + ideName + ": " + ex.getMessage() + "\n\n");
                     scanButton.setDisable(false);
                 });
             }
         }).start();
     }
 
-    private void applyToSsms() {
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    //  APPLY TO IDE — Inject corrected code back into MySQL Workbench
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+    private void applyToIde() {
         String codeToInject = codeEditor.getText();
         if (codeToInject == null || codeToInject.trim().isEmpty()) return;
 
-        chatHistory.appendText("System: Injecting code back into SSMS...\n");
+        chatHistory.appendText("System: Injecting code back into " + ideName + "...\n");
 
         new Thread(() -> {
             try {
-                // 1. Put the new code onto the OS Clipboard
+                // 1. Put the new code onto the system clipboard
                 StringSelection stringSelection = new StringSelection(codeToInject);
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(stringSelection, null);
 
                 Robot robot = new Robot();
 
-                // 2. Alt + Tab back to SSMS
-                robot.keyPress(KeyEvent.VK_ALT);
-                robot.keyPress(KeyEvent.VK_TAB);
-                robot.keyRelease(KeyEvent.VK_TAB);
-                robot.keyRelease(KeyEvent.VK_ALT);
-
+                // 2. Switch to the target IDE
+                OsAutomation.switchToIde(robot);
                 Thread.sleep(1000); // Wait for window switch
 
-                // 3. Select All (Ctrl + A) to highlight the bad code
-                robot.keyPress(KeyEvent.VK_CONTROL);
-                robot.keyPress(KeyEvent.VK_A);
-                robot.keyRelease(KeyEvent.VK_A);
-                robot.keyRelease(KeyEvent.VK_CONTROL);
-
+                // 3. Select All (Cmd+A / Ctrl+A)
+                OsAutomation.modifierCombo(robot, KeyEvent.VK_A);
                 Thread.sleep(150);
 
-                // 4. Paste (Ctrl + V) to overwrite it with the good code
-                robot.keyPress(KeyEvent.VK_CONTROL);
-                robot.keyPress(KeyEvent.VK_V);
-                robot.keyRelease(KeyEvent.VK_V);
-                robot.keyRelease(KeyEvent.VK_CONTROL);
+                // 4. Paste (Cmd+V / Ctrl+V) — overwrites selected text
+                OsAutomation.modifierCombo(robot, KeyEvent.VK_V);
 
                 Platform.runLater(() -> {
-                    chatHistory.appendText("System: Code successfully applied to SSMS.\n\n");
+                    chatHistory.appendText("System: Code successfully applied to " + ideName + ".\n\n");
                 });
 
             } catch (Exception ex) {
-                Platform.runLater(() -> chatHistory.appendText("Error injecting to SSMS: " + ex.getMessage() + "\n\n"));
+                Platform.runLater(() -> chatHistory.appendText("Error injecting to " + ideName + ": " + ex.getMessage() + "\n\n"));
             }
         }).start();
     }
 
-    // NEW: Automatically extract code from the chat window to the editor
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    //  GRAB AI CODE — Extract the latest SQL block from chat history
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
     private void extractCodeToEditor() {
         String fullChat = chatHistory.getText();
 
@@ -273,10 +266,7 @@ public class AiSqlCopilot extends Application {
             int sqlEnd = fullChat.indexOf("```", lastSqlStart + 6);
 
             if (sqlEnd != -1) {
-                // Extract the string between the markers and remove extra whitespace
                 String extractedCode = fullChat.substring(lastSqlStart + 6, sqlEnd).trim();
-
-                // Set the editor text to the extracted code
                 codeEditor.setText(extractedCode);
                 chatHistory.appendText("System: AI code successfully moved to editor.\n\n");
             } else {
@@ -286,6 +276,10 @@ public class AiSqlCopilot extends Application {
             chatHistory.appendText("System: Could not find any formatted SQL code blocks (```sql) in the chat history.\n\n");
         }
     }
+
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    //  SEND MESSAGE — POST to n8n AI Agent and display the response
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
     private void sendMessage(String textToSend, boolean isExecution) {
         String rawText = textToSend.trim();

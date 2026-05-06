@@ -1,5 +1,5 @@
 {
-  "name": "My workflow",
+  "name": "SACO Workflow",
   "nodes": [
     {
       "parameters": {
@@ -23,7 +23,7 @@
         "promptType": "define",
         "text": "=User Request: {{ $json.body.userPrompt }}\n\nCurrent SQL Code in Editor:\n```{{ $json.body.currentCode }}```",
         "options": {
-          "systemMessage": "You are S.A.C.O., a secure AI SQL Copilot. Always respond in plain conversational text.\nCRITICAL RULES:\n1. SAFE DRAFTING: If the user asks you to write code, DO NOT execute it. Just output the drafted SQL code for the user to review.\n2. EXECUTION OVERRIDE: ONLY execute a query against the database if the user's prompt explicitly starts with the exact phrase \"SYSTEM_COMMAND_EXECUTE:\". If you see that phrase, run the query exactly as written. You MUST then display the actual data/rows returned by the database back to the user in a readable format."
+          "systemMessage": "You are S.A.C.O., a secure AI SQL Copilot for MySQL databases. Always respond in plain conversational text.\nCRITICAL RULES:\n1. SAFE DRAFTING: If the user asks you to write code, DO NOT execute it. Just output the drafted MySQL-compatible SQL code for the user to review.\n2. EXECUTION OVERRIDE: ONLY execute a query against the database if the user's prompt explicitly starts with the exact phrase \"SYSTEM_COMMAND_EXECUTE:\". If you see that phrase, run the query exactly as written. You MUST then display the actual data/rows returned by the database back to the user in a readable format.\n3. Always use MySQL syntax (e.g. LIMIT instead of TOP, backtick quoting for identifiers, AUTO_INCREMENT instead of IDENTITY, etc.)."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
@@ -57,22 +57,22 @@
     {
       "parameters": {
         "descriptionType": "manual",
-        "toolDescription": "Use this tool to test and verify SQL queries against the database before returning the final answer to the user.",
+        "toolDescription": "Use this tool to test and verify SQL queries against the MySQL database before returning the final answer to the user.",
         "operation": "executeQuery",
-        "query": "{{ $fromAI(\"queryToExecute\", \"The exact T-SQL query string to run against the database\") }}"
+        "query": "{{ $fromAI(\"queryToExecute\", \"The exact MySQL query string to run against the database\") }}"
       },
-      "type": "n8n-nodes-base.microsoftSqlTool",
+      "type": "n8n-nodes-base.mySqlTool",
       "typeVersion": 1.1,
       "position": [
         224,
         64
       ],
       "id": "deda9c06-87b0-4b3b-b9cc-f6dbff3defbd",
-      "name": "Microsoft SQL",
+      "name": "MySQL",
       "credentials": {
-        "microsoftSql": {
-          "id": "CZrMPveGYqurc61O",
-          "name": "Microsoft SQL account"
+        "mySql": {
+          "id": "YOUR_MYSQL_CREDENTIAL_ID",
+          "name": "MySQL account"
         }
       }
     },
@@ -130,7 +130,7 @@
         ]
       ]
     },
-    "Microsoft SQL": {
+    "MySQL": {
       "ai_tool": [
         [
           {
