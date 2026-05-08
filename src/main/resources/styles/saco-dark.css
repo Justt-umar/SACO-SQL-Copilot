@@ -1,0 +1,344 @@
+/*
+ * ═══════════════════════════════════════════════════════════════
+ *  S.A.C.O. v2 — Premium Dark Theme
+ *
+ *  Color palette:
+ *    Base:    #0f0f1a (deepest), #1a1a2e, #1e1e2e, #25253a
+ *    Surface: #2a2a3d, #33334d
+ *    Accent:  #007acc (blue), #6f42c1 (purple), #28a745 (green)
+ *    Warning: #ffc107 (amber)
+ *    Text:    #e0e0e0 (primary), #a0a0b0 (secondary)
+ * ═══════════════════════════════════════════════════════════════
+ */
+
+/* ── Root & Defaults ──────────────────────────────────────── */
+.root {
+    -fx-base: #1a1a2e;
+    -fx-background: #0f0f1a;
+    -fx-control-inner-background: #1e1e2e;
+    -fx-accent: #007acc;
+    -fx-focus-color: #007acc;
+    -fx-faint-focus-color: transparent;
+    -fx-font-size: 14px;
+}
+
+/* ── Split Pane ───────────────────────────────────────────── */
+.split-pane {
+    -fx-background-color: #0f0f1a;
+    -fx-padding: 0;
+}
+
+.split-pane > .split-pane-divider {
+    -fx-background-color: #33334d;
+    -fx-padding: 0 2 0 2;
+}
+
+/* ── Scroll Pane ──────────────────────────────────────────── */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar {
+    -fx-background-color: #1a1a2e;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #33334d;
+    -fx-background-radius: 4;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #444466;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-shape: "";
+    -fx-padding: 0;
+}
+
+/* ── Chat Panel ───────────────────────────────────────────── */
+.chat-panel {
+    -fx-background-color: #1a1a2e;
+    -fx-padding: 12;
+    -fx-spacing: 10;
+}
+
+.chat-messages {
+    -fx-background-color: #1a1a2e;
+    -fx-spacing: 8;
+    -fx-padding: 8;
+}
+
+/* ── Message Bubbles ──────────────────────────────────────── */
+.message-card {
+    -fx-background-color: #25253a;
+    -fx-background-radius: 10;
+    -fx-padding: 10 14;
+    -fx-spacing: 4;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 6, 0, 0, 2);
+}
+
+.message-card-user {
+    -fx-background-color: #1a3a5c;
+    -fx-background-radius: 10;
+    -fx-padding: 10 14;
+    -fx-spacing: 4;
+    -fx-effect: dropshadow(gaussian, rgba(0,122,204,0.15), 6, 0, 0, 2);
+}
+
+.message-card-system {
+    -fx-background-color: #2a2a2a;
+    -fx-background-radius: 8;
+    -fx-padding: 6 12;
+    -fx-spacing: 2;
+}
+
+.message-role {
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.message-role-user {
+    -fx-text-fill: #4fc3f7;
+}
+
+.message-role-ai {
+    -fx-text-fill: #81c784;
+}
+
+.message-role-system {
+    -fx-text-fill: #ffb74d;
+    -fx-font-size: 11px;
+}
+
+.message-content {
+    -fx-text-fill: #e0e0e0;
+    -fx-wrap-text: true;
+    -fx-line-spacing: 2;
+}
+
+.message-content-system {
+    -fx-text-fill: #a0a0b0;
+    -fx-font-size: 12px;
+    -fx-wrap-text: true;
+}
+
+/* ── Input Area ───────────────────────────────────────────── */
+.input-container {
+    -fx-spacing: 8;
+    -fx-padding: 8 0 0 0;
+}
+
+.text-field, .text-field:focused {
+    -fx-background-color: #25253a;
+    -fx-text-fill: #e0e0e0;
+    -fx-prompt-text-fill: #666680;
+    -fx-background-radius: 8;
+    -fx-padding: 10 14;
+    -fx-border-color: #33334d;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+}
+
+.text-field:focused {
+    -fx-border-color: #007acc;
+    -fx-effect: dropshadow(gaussian, rgba(0,122,204,0.25), 8, 0, 0, 0);
+}
+
+/* ── Code Editor ──────────────────────────────────────────── */
+.code-editor {
+    -fx-control-inner-background: #1e1e2e;
+    -fx-text-fill: #d4d4d4;
+    -fx-highlight-fill: #264f78;
+    -fx-highlight-text-fill: #ffffff;
+    -fx-prompt-text-fill: #555568;
+    -fx-background-radius: 8;
+    -fx-border-color: #33334d;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+}
+
+.code-editor .content {
+    -fx-background-color: #1e1e2e;
+    -fx-background-radius: 8;
+}
+
+.code-editor:focused {
+    -fx-border-color: #6f42c1;
+    -fx-effect: dropshadow(gaussian, rgba(111,66,193,0.2), 8, 0, 0, 0);
+}
+
+/* ── Buttons — Shared Base ────────────────────────────────── */
+.button {
+    -fx-background-color: #33334d;
+    -fx-text-fill: #e0e0e0;
+    -fx-background-radius: 8;
+    -fx-padding: 8 16;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-border-radius: 8;
+}
+
+.button:hover {
+    -fx-background-color: #444466;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 6, 0, 0, 2);
+}
+
+.button:pressed {
+    -fx-background-color: #2a2a40;
+    -fx-effect: none;
+}
+
+.button:disabled {
+    -fx-opacity: 0.45;
+}
+
+/* ── Themed Buttons ───────────────────────────────────────── */
+.btn-scan {
+    -fx-background-color: linear-gradient(to bottom, #0088dd, #006baa);
+    -fx-text-fill: white;
+}
+.btn-scan:hover {
+    -fx-background-color: linear-gradient(to bottom, #009aee, #0077bb);
+}
+
+.btn-grab {
+    -fx-background-color: linear-gradient(to bottom, #7c4ddb, #5a32a3);
+    -fx-text-fill: white;
+}
+.btn-grab:hover {
+    -fx-background-color: linear-gradient(to bottom, #8e5fed, #6b43b4);
+}
+
+.btn-apply {
+    -fx-background-color: linear-gradient(to bottom, #ffca28, #e6ac00);
+    -fx-text-fill: #1a1a2e;
+}
+.btn-apply:hover {
+    -fx-background-color: linear-gradient(to bottom, #ffdb58, #f0bb11);
+}
+
+.btn-run {
+    -fx-background-color: linear-gradient(to bottom, #2ecc40, #219a32);
+    -fx-text-fill: white;
+}
+.btn-run:hover {
+    -fx-background-color: linear-gradient(to bottom, #40dd52, #32ab43);
+}
+
+.btn-send {
+    -fx-background-color: linear-gradient(to bottom, #0088dd, #006baa);
+    -fx-text-fill: white;
+    -fx-min-width: 70;
+}
+.btn-send:hover {
+    -fx-background-color: linear-gradient(to bottom, #009aee, #0077bb);
+}
+
+.btn-settings {
+    -fx-background-color: transparent;
+    -fx-text-fill: #a0a0b0;
+    -fx-padding: 4 8;
+    -fx-font-size: 18px;
+}
+.btn-settings:hover {
+    -fx-text-fill: #e0e0e0;
+}
+
+/* ── Status Bar ───────────────────────────────────────────── */
+.status-bar {
+    -fx-background-color: #0f0f1a;
+    -fx-padding: 4 12;
+    -fx-spacing: 8;
+    -fx-border-color: #33334d transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.status-label {
+    -fx-text-fill: #666680;
+    -fx-font-size: 11px;
+}
+
+.status-connected {
+    -fx-text-fill: #81c784;
+}
+
+.status-disconnected {
+    -fx-text-fill: #e57373;
+}
+
+/* ── Title Bar ────────────────────────────────────────────── */
+.title-bar {
+    -fx-background-color: #0f0f1a;
+    -fx-padding: 6 12;
+    -fx-spacing: 8;
+    -fx-border-color: transparent transparent #33334d transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.title-label {
+    -fx-text-fill: #e0e0e0;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+/* ── Tooltips ─────────────────────────────────────────────── */
+.tooltip {
+    -fx-background-color: #25253a;
+    -fx-text-fill: #e0e0e0;
+    -fx-background-radius: 6;
+    -fx-padding: 6 10;
+    -fx-font-size: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 8, 0, 0, 2);
+}
+
+/* ── Labels ───────────────────────────────────────────────── */
+.label {
+    -fx-text-fill: #e0e0e0;
+}
+
+/* ── Section Header ───────────────────────────────────────── */
+.section-header {
+    -fx-text-fill: #a0a0b0;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 2 4;
+    -fx-text-transform: uppercase;
+}
+
+/* ── Code Panel ───────────────────────────────────────────── */
+.code-panel {
+    -fx-background-color: #1a1a2e;
+    -fx-padding: 12;
+    -fx-spacing: 8;
+}
+
+.button-bar {
+    -fx-spacing: 6;
+}
+
+/* ── Dialog Overrides ─────────────────────────────────────── */
+.dialog-pane {
+    -fx-background-color: #1e1e2e;
+}
+
+.dialog-pane .header-panel {
+    -fx-background-color: #1a1a2e;
+}
+
+.dialog-pane .header-panel .label {
+    -fx-text-fill: #e0e0e0;
+}

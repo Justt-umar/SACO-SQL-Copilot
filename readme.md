@@ -157,40 +157,9 @@ S.A.C.O. operates in a seamless **4-step automated loop** — the core innovatio
 
 ## 🏗 Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    S.A.C.O. Desktop App (JavaFX)                │
-│                                                                  │
-│  ┌─────────────────────┐    ┌──────────────────────────────┐    │
-│  │    Chat Panel        │    │     Code Editor Panel         │    │
-│  │                      │    │                               │    │
-│  │  chatHistory         │    │  🔍 Scan MySQL Workbench      │    │
-│  │  (read-only TextArea)│    │  ⬅️ Grab AI Code             │    │
-│  │                      │    │  ⬇️ Apply to MySQL Workbench  │    │
-│  │  ┌────────┐ ┌────┐  │    │                               │    │
-│  │  │ input  │ │Send│  │    │  codeEditor (dark TextArea)   │    │
-│  │  └────────┘ └────┘  │    │                               │    │
-│  └──────────┬───────────┘    │  ▶ Run Code                   │    │
-│             │                └──────────────┬────────────────┘    │
-│             │ HTTP POST                     │ java.awt.Robot      │
-└─────────────┼───────────────────────────────┼────────────────────┘
-              │                               │
-              ▼                               ▼
-┌──────────────────────────┐    ┌──────────────────────────────┐
-│   n8n Workflow (Docker)   │    │    MySQL Workbench (IDE)      │
-│                           │    │                               │
-│  Webhook ──► AI Agent     │    │  ┌─────────────────────────┐ │
-│               │   │   │   │    │  │  SELECT * FROM users    │ │
-│               ▼   ▼   ▼   │    │  │  WHERE active = 1;     │ │
-│           Gemini Mem MySQL │    │  └─────────────────────────┘ │
-│               │           │    └──────────────────────────────┘
-│               ▼           │
-│       Respond to Webhook  │
-│           │               │                    ┌────────────┐
-│           ▼               │───────────────────▶│   MySQL    │
-│    JSON Response          │   executeQuery     │   Server   │
-└──────────────────────────┘                     └────────────┘
-```
+<div align="center">
+  <img src="Images/Architecture.png" alt="S.A.C.O. Architecture" width="100%"/>
+</div>
 
 **Key design decisions:**
 - **No IDE plugins** — all automation is done through OS-level keyboard events and clipboard, making it version-agnostic.

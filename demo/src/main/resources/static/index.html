@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S.A.C.O. — AI SQL Co-Pilot</title>
+<meta name="description" content="Interactive AI-powered SQL code review assistant.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Reset & Base */
+*{margin:0;padding:0;box-sizing:border-box;}
+:root {
+  --bg: #000000;
+  --bg-grid: rgba(255, 255, 255, 0.03);
+  --card: #0a0a0a;
+  --card-hover: #111111;
+  --border: #1f1f1f;
+  --border-hover: #333333;
+  --text: #ededed;
+  --muted: #878787;
+  --accent: #ffffff;
+  --primary: #3b82f6;
+  --font: 'Inter', -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  background-image: 
+    linear-gradient(to right, var(--bg-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--bg-grid) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: center top;
+}
+::selection { background: rgba(59, 130, 246, 0.3); }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #555; }
+
+/* Floating Nav */
+nav {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(10, 10, 10, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  padding: 10px 20px;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  z-index: 100;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+.nav-brand {
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+.nav-links { display: flex; gap: 24px; align-items: center; }
+.nav-links a {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.nav-links a:hover { color: #fff; }
+.btn-gh {
+  color: #000 !important;
+  background: #fff;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-weight: 600;
+}
+.btn-gh:hover { opacity: 0.9; }
+
+/* Hero */
+.hero {
+  padding: 180px 24px 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 80vw; height: 40vh;
+  background: radial-gradient(ellipse at top, rgba(59, 130, 246, 0.15), transparent 60%);
+  pointer-events: none;
+  z-index: -1;
+}
+.pill {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 16px;
+  border-radius: 100px;
+  margin-bottom: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.pill .pulse {
+  width: 6px; height: 6px;
+  background: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #10b981;
+}
+h1 {
+  font-size: clamp(48px, 6vw, 84px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-bottom: 24px;
+  color: #fff;
+}
+h1 span { color: var(--muted); }
+.hero-subtitle {
+  font-size: 18px;
+  color: var(--muted);
+  max-width: 600px;
+  line-height: 1.5;
+  margin-bottom: 40px;
+  letter-spacing: -0.01em;
+}
+
+/* Demo App Container (macOS style) */
+.demo-wrapper {
+  max-width: 1100px;
+  margin: 0 auto 120px;
+  padding: 0 24px;
+}
+.mac-window {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 32px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.02) inset;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.mac-header {
+  height: 48px;
+  background: #050505;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 8px;
+}
+.mac-dots { display: flex; gap: 8px; }
+.mac-dot { width: 12px; height: 12px; border-radius: 50%; }
+.dot-red { background: #ff5f56; }
+.dot-yel { background: #ffbd2e; }
+.dot-grn { background: #27c93f; }
+.mac-title {
+  flex: 1; text-align: center; font-size: 12px; font-weight: 500; color: #666; margin-right: 48px;
+}
+.app-grid { display: grid; grid-template-columns: 350px 1fr; min-height: 500px; }
+@media (max-width: 800px) { .app-grid { grid-template-columns: 1fr; } }
+
+/* Chat */
+.chat-col {
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  background: #0a0a0a;
+}
+.chat-scroll {
+  flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; max-height: 450px;
+}
+.msg { font-size: 13px; line-height: 1.5; padding: 12px 16px; border-radius: 8px; max-width: 90%; }
+.msg-sys { background: transparent; color: #666; font-size: 12px; text-align: center; align-self: center; }
+.msg-user { background: #1a1a1a; color: #fff; align-self: flex-end; border: 1px solid var(--border); }
+.msg-ai { background: transparent; color: #ddd; align-self: flex-start; padding: 0;}
+.msg-ai pre { background: #000; border: 1px solid var(--border); padding: 12px; border-radius: 6px; margin: 12px 0; overflow-x: auto; font-family: var(--mono); font-size: 12px; color: #a3a3a3; }
+.msg-ai code { color: #fff; }
+.chat-input-area {
+  padding: 16px; border-top: 1px solid var(--border); background: #050505;
+}
+.chat-input-box {
+  display: flex; background: #111; border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+}
+.chat-input-box input {
+  flex: 1; background: transparent; border: none; color: #fff; padding: 10px 14px; font-size: 13px; font-family: var(--font); outline: none;
+}
+.chat-input-box input::placeholder { color: #555; }
+.chat-input-box button {
+  background: #fff; color: #000; border: none; padding: 0 16px; font-weight: 600; font-size: 12px; cursor: pointer; transition: 0.2s;
+}
+.chat-input-box button:hover { background: #e0e0e0; }
+
+/* Editor */
+.editor-col { display: flex; flex-direction: column; background: #000; }
+.editor-toolbar {
+  padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; background: #050505;
+}
+.tool-btn {
+  background: transparent; color: var(--muted); border: 1px solid var(--border); padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: 500; cursor: pointer; transition: 0.2s;
+}
+.tool-btn:hover { background: #111; color: #fff; border-color: #444; }
+.editor-textarea {
+  flex: 1; background: transparent; border: none; color: #d4d4d4; padding: 20px; font-family: var(--mono); font-size: 13px; line-height: 1.6; outline: none; resize: none;
+}
+.editor-footer {
+  padding: 12px 16px; border-top: 1px solid var(--border); background: #050505; display: flex; justify-content: flex-end;
+}
+.run-btn {
+  background: #fff; color: #000; border: none; padding: 8px 16px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px;
+}
+.run-btn:hover { opacity: 0.9; }
+
+/* Bento Features */
+.section-title {
+  font-size: 32px; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 16px; color: #fff;
+}
+.section-sub { font-size: 16px; color: var(--muted); margin-bottom: 48px; max-width: 500px; }
+.bento {
+  max-width: 1100px; margin: 0 auto 120px; padding: 0 24px;
+}
+.bento-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+}
+.bento-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 32px; transition: 0.3s ease; position: relative; overflow: hidden;
+}
+.bento-card:hover { border-color: var(--border-hover); background: var(--card-hover); }
+.bento-card.wide { grid-column: span 2; }
+.bento-card h3 { font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 8px; letter-spacing: -0.01em; }
+.bento-card p { font-size: 14px; color: var(--muted); }
+.bento-icon {
+  width: 40px; height: 40px; border-radius: 8px; background: #111; border: 1px solid #222; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; color: #fff;
+}
+@media (max-width: 900px) { .bento-grid { grid-template-columns: 1fr; } .bento-card.wide { grid-column: span 1; } }
+
+/* Walkthrough */
+.walkthrough { max-width: 1100px; margin: 0 auto 120px; padding: 0 24px; }
+.wt-item {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; margin-bottom: 80px;
+}
+.wt-item:nth-child(even) { direction: rtl; }
+.wt-item:nth-child(even) > * { direction: ltr; }
+.wt-img {
+  background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 8px; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+.wt-img img { width: 100%; height: auto; border-radius: 6px; display: block; border: 1px solid var(--border); }
+.wt-text h3 { font-size: 24px; font-weight: 600; color: #fff; margin-bottom: 16px; letter-spacing: -0.02em; }
+.wt-text p { font-size: 15px; color: var(--muted); }
+@media (max-width: 800px) { .wt-item { grid-template-columns: 1fr; gap: 32px; } }
+
+/* Footer */
+footer {
+  border-top: 1px solid var(--border); padding: 48px 24px; text-align: center; color: var(--muted); font-size: 13px; background: #000;
+}
+footer a { color: #fff; text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">S.A.C.O.</div>
+  <div class="nav-links">
+    <a href="#demo">Demo</a>
+    <a href="#features">Features</a>
+    <a href="#walkthrough">Walkthrough</a>
+    <a href="https://github.com/Justt-umar/SACO-SQL-Copilot" target="_blank" class="btn-gh">GitHub</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="pill"><div class="pulse"></div> Local Orchestration Engine</div>
+  <h1>SQL Agentic<br><span>Co-Pilot</span></h1>
+  <p class="hero-subtitle">A cross-platform desktop AI assistant that bridges MySQL Workbench with an AI-powered code review engine — no IDE plugins required.</p>
+</section>
+
+<section class="demo-wrapper" id="demo">
+  <div class="mac-window">
+    <div class="mac-header">
+      <div class="mac-dots">
+        <div class="mac-dot dot-red"></div>
+        <div class="mac-dot dot-yel"></div>
+        <div class="mac-dot dot-grn"></div>
+      </div>
+      <div class="mac-title">S.A.C.O. Live Preview</div>
+    </div>
+    <div class="app-grid">
+      <div class="chat-col">
+        <div class="chat-scroll" id="chatMessages">
+          <div class="msg msg-sys">Session isolated. AI engine ready.</div>
+          <div class="msg msg-ai"><strong>S.A.C.O.</strong><br><br>Hello. Paste a query in the editor and click Run, or ask me a question directly.</div>
+        </div>
+        <div class="chat-input-area">
+          <div class="chat-input-box">
+            <input type="text" id="chatInput" placeholder="Ask about SQL..." autocomplete="off">
+            <button id="sendBtn" onclick="sendMessage()">Send</button>
+          </div>
+        </div>
+      </div>
+      <div class="editor-col">
+        <div class="editor-toolbar">
+          <button class="tool-btn" onclick="loadEx(0)">Example: Missing JOIN</button>
+          <button class="tool-btn" onclick="loadEx(1)">Example: Risky UPDATE</button>
+          <button class="tool-btn" onclick="loadEx(2)">Example: N+1</button>
+        </div>
+        <textarea class="editor-textarea" id="codeEditor" spellcheck="false">SELECT u.*, o.*
+FROM users u, orders o
+WHERE u.id = o.user_id
+AND o.status = 'active'
+ORDER BY o.created_at</textarea>
+        <div class="editor-footer">
+          <button class="run-btn" onclick="sendMessage(true)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            Review Code
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bento" id="features">
+  <h2 class="section-title">Engineered for control.</h2>
+  <p class="section-sub">A decoupled architecture utilizing native OS capabilities and containerized workflows.</p>
+  
+  <div class="bento-grid">
+    <div class="bento-card wide">
+      <div class="bento-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+      </div>
+      <h3>Dockerized n8n Backbone</h3>
+      <p>The entire AI workflow runs locally in a containerized n8n instance. Memory buffering, prompt orchestration, and database tool execution happen securely off-screen.</p>
+    </div>
+    <div class="bento-card">
+      <div class="bento-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+      </div>
+      <h3>OS-Level Automation</h3>
+      <p>Zero IDE plugins required. Uses java.awt.Robot and AppleScript to read the clipboard and interact directly with MySQL Workbench.</p>
+    </div>
+    <div class="bento-card">
+      <div class="bento-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+      </div>
+      <h3>Human-in-the-loop</h3>
+      <p>By default, S.A.C.O. only drafts code. Live execution against the database is blocked unless explicitly authorized via strict system prompts.</p>
+    </div>
+    <div class="bento-card wide">
+      <div class="bento-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+      </div>
+      <h3>Automated Startup Orchestrator</h3>
+      <p>A multi-threaded Java orchestrator handles the entire cold boot sequence: spinning up Docker Desktop, waiting for the n8n webhook health check, launching MySQL Workbench, and maximizing the IDE.</p>
+    </div>
+  </div>
+</section>
+
+<section class="walkthrough" id="walkthrough">
+  <h2 class="section-title">Application Walkthrough</h2>
+  <p class="section-sub">A visual tour of the desktop experience.</p>
+
+  <div class="wt-item">
+    <div class="wt-text">
+      <h3>Premium JavaFX Interface</h3>
+      <p>S.A.C.O. runs as a native desktop application featuring a translucent, always-on-top glassmorphism UI. It auto-docks to the bottom-right corner of your screen, providing a non-intrusive co-pilot overlay.</p>
+    </div>
+    <div class="wt-img"><img src="images/Interface.png" alt="S.A.C.O. Interface"></div>
+  </div>
+
+  <div class="wt-item">
+    <div class="wt-text">
+      <h3>Agentic IDE Interaction</h3>
+      <p>Scan code directly from MySQL Workbench, ask the AI for optimizations, and seamlessly inject the corrected SQL back into the editor using vertical action buttons and simulated keystrokes.</p>
+    </div>
+    <div class="wt-img"><img src="images/SACO.png" alt="S.A.C.O. Interaction"></div>
+  </div>
+
+  <div class="wt-item">
+    <div class="wt-text">
+      <h3>Visual n8n Workflow</h3>
+      <p>The orchestration layer is entirely decoupled. S.A.C.O. communicates with this local n8n workflow via HTTP POST, allowing easy swapping of LLM providers (Gemini, Claude, GPT) without recompiling the Java code.</p>
+    </div>
+    <div class="wt-img"><img src="images/n8n_Architecture.png" alt="n8n Architecture"></div>
+  </div>
+
+  <div class="wt-item" id="architecture">
+    <div class="wt-text">
+      <h3>High-Level Architecture</h3>
+      <p>A completely decentralized, OS-native architecture. The system bridges your local IDE, Dockerized workflows, and remote LLMs into a singular cohesive experience.</p>
+    </div>
+    <div class="wt-img"><img src="images/architecture.png" alt="S.A.C.O. Architecture Diagram"></div>
+  </div>
+</section>
+
+<footer>
+  <p>Engineered by Umar Khan</p>
+  <p style="margin-top: 8px;"><a href="https://github.com/Justt-umar/SACO-SQL-Copilot" target="_blank">View Repository</a></p>
+</footer>
+
+<script>
+const ex = [
+  "-- Bug: Missing JOIN keyword\nSELECT u.name, o.total\nFROM users u INNER orders o\nON u.id = o.user_id\nWHERE o.status = 'active';",
+  "-- Risky: UPDATE without WHERE\nUPDATE products\nSET price = price * 1.10;",
+  "-- Optimize: N+1 subquery\nSELECT name,\n  (SELECT COUNT(*) FROM orders WHERE orders.user_id = users.id) as count\nFROM users\nORDER BY count DESC;"
+];
+
+function loadEx(i) { document.getElementById('codeEditor').value = ex[i]; }
+
+function addMsg(type, html) {
+  const div = document.createElement('div');
+  div.className = 'msg msg-' + type;
+  if(type === 'ai') {
+    div.innerHTML = '<strong>S.A.C.O.</strong><br><br>' + html.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>').replace(/\n/g, '<br>');
+  } else {
+    div.textContent = html;
+  }
+  const chat = document.getElementById('chatMessages');
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  return div;
+}
+
+async function sendMessage(useEditor = false) {
+  const input = document.getElementById('chatInput');
+  const editor = document.getElementById('codeEditor');
+  const btn = document.getElementById('sendBtn');
+  
+  let prompt = useEditor ? 'Review this SQL code' : input.value.trim();
+  if(!prompt) return;
+
+  addMsg('user', prompt);
+  if(!useEditor) input.value = '';
+  
+  btn.disabled = true;
+  const loading = addMsg('sys', 'Analyzing...');
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userPrompt: prompt, currentCode: editor.value })
+    });
+    const data = await res.json();
+    loading.remove();
+    if (res.ok) addMsg('ai', data.response);
+    else addMsg('sys', 'Error: ' + data.error);
+  } catch (e) {
+    loading.remove();
+    addMsg('sys', 'Network error. Make sure the Spring Boot server is running.');
+  }
+  btn.disabled = false;
+}
+
+document.getElementById('chatInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') sendMessage();
+});
+</script>
+</body>
+</html>

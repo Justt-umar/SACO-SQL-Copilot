@@ -6,26 +6,58 @@
 
     <groupId>com.example</groupId>
     <artifactId>AiSqlCopilot</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <name>AiSqlCopilot</name>
+    <version>2.0-SNAPSHOT</version>
+    <name>S.A.C.O. — SQL Agentic Co-Pilot Orchestrator</name>
+    <description>Cross-platform AI assistant for MySQL Workbench</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>23</java.version>
+        <javafx.version>21.0.6</javafx.version>
+        <jackson.version>2.17.1</jackson.version>
+        <slf4j.version>2.0.13</slf4j.version>
+        <logback.version>1.5.6</logback.version>
         <junit.version>5.12.1</junit.version>
     </properties>
 
     <dependencies>
+        <!-- ── JavaFX ────────────────────────────────────── -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>21.0.6</version>
+            <version>${javafx.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>21.0.6</version>
+            <version>${javafx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+            <version>${javafx.version}</version>
         </dependency>
 
+        <!-- ── JSON (Jackson) — replaces manual string escaping ── -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <!-- ── Logging (SLF4J + Logback) ─────────────────── -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+
+        <!-- ── Testing ───────────────────────────────────── -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -47,8 +79,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <source>23</source>
-                    <target>23</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -70,6 +102,11 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
             </plugin>
         </plugins>
     </build>
