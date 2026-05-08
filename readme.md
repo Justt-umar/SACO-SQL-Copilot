@@ -15,7 +15,7 @@
 [![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey?style=flat-square&logo=apple)](https://github.com/Justt-umar/SACO-SQL-Copilot)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-[Report Bug](https://github.com/Justt-umar/SACO-SQL-Copilot/issues) · [Request Feature](https://github.com/Justt-umar/SACO-SQL-Copilot/issues) · [Live Demo](https://saco-sql-copilot.onrender.com)
+[Live Demo](https://saco-sql-copilot.onrender.com) · [Report Bug](https://github.com/Justt-umar/SACO-SQL-Copilot/issues) · [Request Feature](https://github.com/Justt-umar/SACO-SQL-Copilot/issues) 
 
 </div>
 
