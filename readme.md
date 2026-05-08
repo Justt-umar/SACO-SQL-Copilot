@@ -1,8 +1,5 @@
 <div align="center">
 
-<img src="Images/SACO.png" alt="SACO Logo" width="200" />
-<br><br>
-
 <img src="https://img.shields.io/badge/S.A.C.O.-SQL%20Copilot-00c853?style=for-the-badge&logo=openai&logoColor=white" alt="SACO SQL Copilot" />
 
 # 🤖 S.A.C.O. — SQL Agentic Co-Pilot Orchestrator
@@ -18,11 +15,7 @@
 [![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey?style=flat-square&logo=apple)](https://github.com/Justt-umar/SACO-SQL-Copilot)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-[Report Bug](https://github.com/Justt-umar/SACO-SQL-Copilot/issues) · [Request Feature](https://github.com/Justt-umar/SACO-SQL-Copilot/issues)
-
-<br>
-
-### 🚀 **[Click Here to Open the Live Web Application](https://saco-sql-copilot.onrender.com)**
+[Report Bug](https://github.com/Justt-umar/SACO-SQL-Copilot/issues) · [Request Feature](https://github.com/Justt-umar/SACO-SQL-Copilot/issues) · [Live Demo](https://saco-sql-copilot.onrender.com)
 
 </div>
 
@@ -52,6 +45,8 @@
 ---
 
 ## 🌟 Overview
+
+<img src="Images/SACO.png" alt="SACO Logo" width="140" align="right" />
 
 **S.A.C.O.** is a desktop AI assistant that sits on top of your screen and acts as a real-time co-pilot for MySQL Workbench. It uses OS-level keyboard automation (`java.awt.Robot`) to physically scan code from your IDE, sends it to an AI Agent for review, and injects the corrected code back — all without a single IDE plugin or extension.
 
