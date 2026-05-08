@@ -287,9 +287,9 @@ footer a:hover { text-decoration: underline; }
 </nav>
 
 <section class="hero">
-  <div class="pill"><div class="pulse"></div> Local Orchestration Engine</div>
+  <div class="pill"><div class="pulse"></div> AI Desktop Application & Automation Engine</div>
   <h1>SQL Agentic<br><span>Co-Pilot</span></h1>
-  <p class="hero-subtitle">A cross-platform desktop AI assistant that bridges MySQL Workbench with an AI-powered code review engine — no IDE plugins required.</p>
+  <p class="hero-subtitle">I built a cross-platform Java desktop application that injects AI directly into MySQL Workbench. By utilizing OS-level automation, it securely scans, reviews, and executes code without requiring any IDE plugins, solving a major friction point in database development.</p>
 </section>
 
 <section class="demo-wrapper" id="demo">
@@ -338,49 +338,49 @@ ORDER BY o.created_at</textarea>
 </section>
 
 <section class="bento" id="features">
-  <h2 class="section-title">Engineered for control.</h2>
-  <p class="section-sub">A decoupled architecture utilizing native OS capabilities and containerized workflows.</p>
+  <h2 class="section-title">The Problem & The Solution</h2>
+  <p class="section-sub">Why I built this, and how it demonstrates full-stack systems engineering.</p>
   
   <div class="bento-grid">
     <div class="bento-card wide">
       <div class="bento-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
       </div>
-      <h3>Dockerized n8n Backbone</h3>
-      <p>The entire AI workflow runs locally in a containerized n8n instance. Memory buffering, prompt orchestration, and database tool execution happen securely off-screen.</p>
+      <h3>The Problem: Closed Ecosystems</h3>
+      <p>MySQL Workbench is a legacy IDE that does not support modern AI extensions. Developers are forced to constantly copy-paste code between their database editor and ChatGPT, breaking their flow and losing database context.</p>
     </div>
     <div class="bento-card">
       <div class="bento-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
       </div>
-      <h3>OS-Level Automation</h3>
-      <p>Zero IDE plugins required. Uses java.awt.Robot and AppleScript to read the clipboard and interact directly with MySQL Workbench.</p>
+      <h3>The Solution: OS-Level Automation</h3>
+      <p>I engineered a Java app using <code>java.awt.Robot</code> and AppleScript to physically control the host OS. It reads the user's IDE state, interacts with the clipboard, and simulates keystrokes to act as a seamless bridge.</p>
     </div>
     <div class="bento-card">
       <div class="bento-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
       </div>
-      <h3>Human-in-the-loop</h3>
-      <p>By default, S.A.C.O. only drafts code. Live execution against the database is blocked unless explicitly authorized via strict system prompts.</p>
+      <h3>Secure AI Execution</h3>
+      <p>Rather than blindly generating text, S.A.C.O. uses a Dockerized n8n workflow to connect Google Gemini directly to the live MySQL database, allowing it to test queries safely with human-in-the-loop authorization.</p>
     </div>
     <div class="bento-card wide">
       <div class="bento-icon">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
       </div>
-      <h3>Automated Startup Orchestrator</h3>
-      <p>A multi-threaded Java orchestrator handles the entire cold boot sequence: spinning up Docker Desktop, waiting for the n8n webhook health check, launching MySQL Workbench, and maximizing the IDE.</p>
+      <h3>Systems Architecture</h3>
+      <p>This project required bridging multiple domains: a multi-threaded Java orchestrator for container management, a premium JavaFX user interface, native OS scripting, and complex prompt engineering for the AI logic.</p>
     </div>
   </div>
 </section>
 
 <section class="walkthrough" id="walkthrough">
-  <h2 class="section-title">Application Walkthrough</h2>
-  <p class="section-sub">A visual tour of the desktop experience.</p>
+  <h2 class="section-title">Technical Highlights</h2>
+  <p class="section-sub">A breakdown of the project components and my design decisions.</p>
 
   <div class="wt-item">
     <div class="wt-text">
       <h3>Premium JavaFX Interface</h3>
-      <p>S.A.C.O. runs as a native desktop application featuring a translucent, always-on-top glassmorphism UI. It auto-docks to the bottom-right corner of your screen, providing a non-intrusive co-pilot overlay.</p>
+      <p>I designed S.A.C.O. as a native desktop application with a translucent, always-on-top UI. It auto-docks to the bottom-right corner of the screen, ensuring the developer can see both the AI context and their IDE simultaneously.</p>
     </div>
     <div class="wt-img"><img src="images/Interface.png" alt="S.A.C.O. Interface"></div>
   </div>
@@ -388,23 +388,23 @@ ORDER BY o.created_at</textarea>
   <div class="wt-item">
     <div class="wt-text">
       <h3>Agentic IDE Interaction</h3>
-      <p>Scan code directly from MySQL Workbench, ask the AI for optimizations, and seamlessly inject the corrected SQL back into the editor using vertical action buttons and simulated keystrokes.</p>
+      <p>By clicking "Scan", the app automatically switches to the IDE, copies the code, and pulls it into the AI engine. "Apply" reverses the flow, dynamically injecting the corrected SQL back into the user's workflow without manual copy-pasting.</p>
     </div>
     <div class="wt-img"><img src="images/SACO.png" alt="S.A.C.O. Interaction"></div>
   </div>
 
   <div class="wt-item">
     <div class="wt-text">
-      <h3>Visual n8n Workflow</h3>
-      <p>The orchestration layer is entirely decoupled. S.A.C.O. communicates with this local n8n workflow via HTTP POST, allowing easy swapping of LLM providers (Gemini, Claude, GPT) without recompiling the Java code.</p>
+      <h3>Decoupled n8n Architecture</h3>
+      <p>To ensure maintainability, the backend is entirely decoupled. S.A.C.O. communicates via HTTP POST to a local n8n Docker container, allowing me to swap LLM providers or update prompt logic without touching the core Java codebase.</p>
     </div>
     <div class="wt-img"><img src="images/n8n_Architecture.png" alt="n8n Architecture"></div>
   </div>
 
   <div class="wt-item" id="architecture">
     <div class="wt-text">
-      <h3>High-Level Architecture</h3>
-      <p>A completely decentralized, OS-native architecture. The system bridges your local IDE, Dockerized workflows, and remote LLMs into a singular cohesive experience.</p>
+      <h3>Complex Systems Integration</h3>
+      <p>This architecture diagram demonstrates my ability to design robust, decentralized systems. It securely connects a host OS application with containerized microservices and a cloud-based LLM, all while maintaining strict data boundaries.</p>
     </div>
     <div class="wt-img"><img src="images/architecture.png" alt="S.A.C.O. Architecture Diagram"></div>
   </div>
