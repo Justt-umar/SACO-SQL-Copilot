@@ -1,5 +1,8 @@
 <div align="center">
 
+<img src="Images/SACO.png" alt="SACO Logo" width="200" />
+<br><br>
+
 <img src="https://img.shields.io/badge/S.A.C.O.-SQL%20Copilot-00c853?style=for-the-badge&logo=openai&logoColor=white" alt="SACO SQL Copilot" />
 
 # 🤖 S.A.C.O. — SQL Agentic Co-Pilot Orchestrator
@@ -16,6 +19,10 @@
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
 [Report Bug](https://github.com/Justt-umar/SACO-SQL-Copilot/issues) · [Request Feature](https://github.com/Justt-umar/SACO-SQL-Copilot/issues)
+
+<br>
+
+### 🚀 **[Click Here to Open the Live Web Application](https://saco-sql-copilot.onrender.com)**
 
 </div>
 
@@ -112,6 +119,12 @@ S.A.C.O. operates in a seamless **4-step automated loop** — the core innovatio
 - **Human-in-the-Loop** — no accidental `UPDATE`, `DELETE`, or `DROP` without manual authorization
 
 ### 🖥️ Desktop UI
+
+<div align="center">
+  <img src="Images/Interface.png" alt="S.A.C.O. Desktop UI" width="100%"/>
+</div>
+<br>
+
 - **Always-on-Top** — stays visible while working in MySQL Workbench (`setAlwaysOnTop(true)`)
 - **95% Opacity** — semi-transparent so you can see your IDE underneath
 - **SplitPane Layout** — chat panel (40%) + code editor (60%), resizable
@@ -318,6 +331,11 @@ This directly activates MySQL Workbench by name — it works regardless of how m
 ---
 
 ## 📡 n8n Workflow Reference
+
+<div align="center">
+  <img src="Images/n8n_Architecture.png" alt="n8n AI Workflow" width="100%"/>
+</div>
+<br>
 
 ### Webhook Endpoint
 
