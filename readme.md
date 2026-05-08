@@ -46,7 +46,7 @@
 
 ## 🌟 Overview
 
-<img src="Images/SACO.png" alt="SACO Logo" width="140" align="right" />
+<img src="Images/SACO.png" alt="SACO Logo" width="350" align="right" />
 
 **S.A.C.O.** is a desktop AI assistant that sits on top of your screen and acts as a real-time co-pilot for MySQL Workbench. It uses OS-level keyboard automation (`java.awt.Robot`) to physically scan code from your IDE, sends it to an AI Agent for review, and injects the corrected code back — all without a single IDE plugin or extension.
 
